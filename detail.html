@@ -107,16 +107,20 @@
     <div class="detail_1 row">
 	  <div class="col-md-6">
 	    <div class="detail_1l">
-		  <h2>The Fifth Day</h2>
-		  <h6 class="mb-0 text-muted">Thriller / 160 Mins</h6>
+		  <h2 id="movie-title">Loading...</h2>
+		  <h6 class="mb-0 text-muted" id="movie-description"></h6>
 		</div>
 	  </div>
 	  <div class="col-md-6">
 	    <div class="detail_1r text-end">
-		  <h6 class="mb-0"><a class="button_2" href="#">Get Ticket</a></h6>
+		  <h6 class="mb-0"><a class="button_2" href="#" id="get-ticket-btn">Get Ticket</a></h6>
 		</div>
 	  </div>
 	</div>
+	<div id="showtimes-section" class="my-4">
+  <h3>Showtimes</h3>
+  <div id="showtimes-list">Loading showtimes...</div>
+</div>
 	<div class="detail_2 row mt-4">
 	  <div class="col-md-4">
 	    <div class="detail_2l">
@@ -130,16 +134,10 @@
 	  <div class="col-md-8">
 	    <div class="detail_2r  position-relative">
 	       <div class="detail_2ri">
-		      <div class="grid clearfix">
-				  <figure class="effect-jazz mb-0">
-					<a href="#"><img src="img/13.jpg" height="530" class="w-100" alt="abc"></a>
-				  </figure>
-			  </div>
 		   </div>
-		   <div class="detail_2ri1 position-absolute top-0 text-center bg_back w-100 h-100">
-		     <span class="lh-1"><a class="col_oran"  href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#templateVideoModal"><i class="fa fa-play-circle align-middle"></i></a></span>
-			 <h4 class="mb-0 mt-3"><a class="text-white" href="#">Watch the Trailer</a></h4>
-		   </div>
+		   <div id="trailer-section" class="text-center my-4">
+  <!-- Trailer will be injected here by JS -->
+</div>
 		</div>
 	  </div>
 	</div>
@@ -496,6 +494,77 @@ I agree to all terms and policies of the company
 </script>
 
 <script src="js/common.js"></script>
+<script>
+function getQueryParam(param) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(param);
+}
+function isYouTubeUrl(url) {
+  return url && (url.includes('youtube.com') || url.includes('youtu.be'));
+}
+function renderShowtimes(movieId) {
+  $.getJSON('api/get_showtimes.php?movie_id=' + movieId, function(res) {
+    if (res.success && res.data.length > 0) {
+      let html = '<ul class="list-group">';
+      res.data.forEach(function(showtime) {
+        html += `<li class="list-group-item">${showtime.showtime.replace('T', ' ').replace(':00.000Z', '')}${showtime.location ? ' @ ' + showtime.location : ''}</li>`;
+      });
+      html += '</ul>';
+      $('#showtimes-list').html(html);
+    } else {
+      $('#showtimes-list').html('<span class="text-muted">No showtimes available.</span>');
+    }
+  });
+}
+$(document).ready(function() {
+  var movieId = getQueryParam('id');
+  if (!movieId) {
+    $('#movie-title').text('Movie not found');
+    $('#movie-description').text('');
+    return;
+  }
+  $.getJSON('api/get_movies.php', function(response) {
+    if (response.success) {
+      var movie = response.data.find(function(m) { return m.id == movieId; });
+      if (movie) {
+        $('#movie-title').text(movie.title);
+        $('#movie-description').text(movie.description + (movie.duration ? ' / ' + movie.duration + ' Mins' : ''));
+        $('#get-ticket-btn').attr('href', 'ticket.html?movie_id=' + movie.id);
+        if (movie.trailer_url) {
+          if (isYouTubeUrl(movie.trailer_url)) {
+            // Extract YouTube video ID
+            var videoId = '';
+            var match = movie.trailer_url.match(/[?&]v=([^&#]+)/);
+            if (match) videoId = match[1];
+            else if (movie.trailer_url.includes('youtu.be/')) videoId = movie.trailer_url.split('youtu.be/')[1].split(/[?&#]/)[0];
+            if (videoId) {
+              $('#trailer-section').html('<iframe width="100%" height="400" src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" allowfullscreen></iframe><h4 class="mb-0 mt-3"><a class="text-white" href="' + movie.trailer_url + '" target="_blank">Watch on YouTube</a></h4>');
+            } else {
+              $('#trailer-section').html('<h4 class="mb-0 mt-3"><a class="text-white" href="' + movie.trailer_url + '" target="_blank">Watch the Trailer</a></h4>');
+            }
+          } else {
+            $('#trailer-section').html('<h4 class="mb-0 mt-3"><a class="text-white" href="' + movie.trailer_url + '" target="_blank">Watch the Trailer</a></h4>');
+          }
+          $('#trailer-section').show();
+        } else {
+          $('#trailer-section').hide();
+        }
+      } else {
+        $('#movie-title').text('Movie not found');
+        $('#movie-description').text('');
+        $('#trailer-section').hide();
+      }
+    } else {
+      $('#movie-title').text('Error loading movie');
+      $('#movie-description').text('');
+      $('#trailer-section').hide();
+    }
+  });
+  if (movieId) {
+    renderShowtimes(movieId);
+  }
+});
+</script>
 </body>
 
 

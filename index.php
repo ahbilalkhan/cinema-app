@@ -156,58 +156,41 @@ Shows</h3>
 		<h1 class="mb-0 font_50">Movies Now Playing</h1>
 	  </div>
    </div>
-   <div class="row trend_2">
-      <div class="col-md-3 col-sm-6">
-       <div class="trend_2i position-relative">
-	     <div class="trend_2i1">
-	       <img src="img/5.jpg" class="w-100" alt="abc">
-	   </div>
-	   <div class="trend_2i2 bg_back position-absolute w-100 h-100 top-0 px-4">
-	    <h6 class="font_14 text-light">Comedy / 180 Mins </h6>
-		<h5><a class="text-white a_tag" href="#">The Fifth Day</a></h5>
-		<h6 class="mb-0 mt-3"><a class="button_1 p-2 px-3 font_14" href="#">Get Ticket</a></h6>
-	   </div>
-	   </div>
-	  </div>
-	  <div class="col-md-3 col-sm-6">
-       <div class="trend_2i position-relative">
-	     <div class="trend_2i1">
-	       <img src="img/6.jpg" class="w-100" alt="abc">
-	   </div>
-	   <div class="trend_2i2 bg_back position-absolute w-100 h-100 top-0 px-4">
-	    <h6 class="font_14 text-light">Animation / 160 Mins </h6>
-		<h5><a class="text-white a_tag" href="#">Black & White</a></h5>
-		<h6 class="mb-0 mt-3"><a class="button_1 p-2 px-3 font_14" href="#">Get Ticket</a></h6>
-	   </div>
-	   </div>
-	  </div>
-	  <div class="col-md-3 col-sm-6">
-       <div class="trend_2i position-relative">
-	     <div class="trend_2i1">
-	       <img src="img/7.jpg" class="w-100" alt="abc">
-	   </div>
-	   <div class="trend_2i2 bg_back position-absolute w-100 h-100 top-0 px-4">
-	    <h6 class="font_14 text-light">Thriller / 190 Mins </h6>
-		<h5><a class="text-white a_tag" href="#">Scariest Game</a></h5>
-		<h6 class="mb-0 mt-3"><a class="button_1 p-2 px-3 font_14" href="#">Get Ticket</a></h6>
-	   </div>
-	   </div>
-	  </div>
-	  <div class="col-md-3 col-sm-6">
-       <div class="trend_2i position-relative">
-	     <div class="trend_2i1">
-	       <img src="img/8.png" class="w-100" alt="abc">
-	   </div>
-	   <div class="trend_2i2 bg_back position-absolute w-100 h-100 top-0 px-4">
-	    <h6 class="font_14 text-light">Romance / 150 Mins </h6>
-		<h5><a class="text-white a_tag" href="#">New Day Dreams</a></h5>
-		<h6 class="mb-0 mt-3"><a class="button_1 p-2 px-3 font_14" href="#">Get Ticket</a></h6>
-	   </div>
-	   </div>
-	  </div>
+   <div class="row trend_2" id="now-playing-list">
+     <!-- Movies will be injected here by JS -->
    </div>
  </div>
 </section>
+
+<script src="js/common.js"></script>
+<script>
+$(document).ready(function() {
+  $.getJSON('api/get_movies.php', function(response) {
+    if (response.success) {
+      var moviesHtml = '';
+      response.data.forEach(function(movie) {
+        moviesHtml += `
+        <div class="col-md-3 col-sm-6">
+          <div class="trend_2i position-relative">
+            <div class="trend_2i1">
+              <img src="img/5.jpg" class="w-100" alt="${movie.title}">
+            </div>
+            <div class="trend_2i2 bg_back position-absolute w-100 h-100 top-0 px-4">
+              <h6 class="font_14 text-light">${movie.description ? movie.description.substring(0, 30) : ''}</h6>
+              <h5><a class="text-white a_tag" href="detail.html?id=${movie.id}">${movie.title}</a></h5>
+              <h6 class="mb-0 mt-3"><a class="button_1 p-2 px-3 font_14" href="detail.html?id=${movie.id}">Get Ticket</a></h6>
+            </div>
+          </div>
+        </div>
+        `;
+      });
+      $('#now-playing-list').html(moviesHtml);
+    } else {
+      $('#now-playing-list').html('<div class="col-12 text-center text-danger">Failed to load movies.</div>');
+    }
+  });
+});
+</script>
 
 <section id="feat" class="p_3 bg-light">
  <div class="container-xl">

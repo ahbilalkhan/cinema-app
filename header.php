@@ -96,8 +96,8 @@
 	       <li class="nav-item">
           <a class="nav-link fs-5 drop_icon" data-bs-target="#exampleModal2" data-bs-toggle="modal" href="#"><i class="fa fa-search"></i></a>
         </li>
-		    <li class="nav-item">
-          <a class="nav-link fs-5 drop_icon" href="#"><i class="fa fa-user"></i></a>
+        <li class="nav-item" id="user-nav-placeholder">
+          <!-- User info will be injected here -->
         </li>
       </ul>
     </div>
@@ -105,3 +105,31 @@
 </nav>
 </section>
  </div>
+<script>
+$(document).ready(function() {
+  function updateUserNav() {
+    $.getJSON('api/session_check.php', function(res) {
+      console.log('Session check:', res); // Debug: print session check response
+      if (res.logged_in) {
+        $('#user-nav-placeholder').html('
+          <span class="nav-link">👤 ' + res.username + '</span>' +
+          '<a class="nav-link" href="#" id="logout-btn">Logout</a>'
+        );
+      } else {
+        $('#user-nav-placeholder').html('
+          <a class="nav-link" href="login.html">Login</a>' +
+          '<a class="nav-link" href="register.html">Register</a>'
+        );
+      }
+    });
+  }
+  updateUserNav();
+  $(document).on('click', '#logout-btn', function(e) {
+    e.preventDefault();
+    $.get('api/logout.php', function() {
+      updateUserNav();
+      window.location.href = 'index.html';
+    });
+  });
+});
+</script>

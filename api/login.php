@@ -1,5 +1,6 @@
 <?php
-require_once 'cors.php';
+session_start();
+header('Content-Type: application/json');
 require_once '../db.php';
 
 $data = json_decode(file_get_contents('php://input'), true);
@@ -14,7 +15,9 @@ try {
     $stmt->execute([$data['username']]);
     $user = $stmt->fetch();
     if ($user && password_verify($data['password'], $user['password'])) {
-        echo json_encode(['success' => true, 'user_id' => $user['id']]);
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+        echo json_encode(['success' => true, 'user_id' => $user['id'], 'username' => $user['username']]);
     } else {
         http_response_code(401);
         echo json_encode(['success' => false, 'error' => 'Invalid credentials']);

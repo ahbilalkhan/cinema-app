@@ -1,9 +1,8 @@
 <?php
-// db.php - Database connection using PDO
 $host = 'localhost';
-$db   = 'movie_db'; // Change to your database name
-$user = 'root';    // Change to your DB username
-$pass = '';        // Change to your DB password
+$db   = 'movie_db';
+$user = 'root'; 
+$pass = ''; 
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";

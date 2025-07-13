@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/font-awesome.min.css" rel="stylesheet">
+  <link href="css/global.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Admin Dashboard</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="#movies-section">Movies</a></li>
+          <li class="nav-item"><a class="nav-link" href="#users-section">Users</a></li>
+          <li class="nav-item"><a class="nav-link" href="#tickets-section">Tickets</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="container mt-4">
+    <h2>Welcome, Admin!</h2>
+    <hr>
+    <section id="movies-section">
+      <h3>Manage Movies</h3>
+      <form id="add-movie-form" class="row g-3 mb-4">
+        <div class="col-md-3">
+          <input type="text" class="form-control" id="movie-title" placeholder="Title" required>
+        </div>
+        <div class="col-md-3">
+          <input type="text" class="form-control" id="movie-description" placeholder="Description" required>
+        </div>
+        <div class="col-md-2">
+          <input type="date" class="form-control" id="movie-release-date" required>
+        </div>
+        <div class="col-md-2">
+          <input type="number" class="form-control" id="movie-duration" placeholder="Duration (min)" required>
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-primary w-100">Add Movie</button>
+        </div>
+      </form>
+      <div id="movie-message" class="mb-3"></div>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Release Date</th>
+            <th>Duration</th>
+            <th>Trailer URL</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="movies-table-body">
+          <!-- Movies will be loaded here -->
+        </tbody>
+      </table>
+      <!-- Edit Movie Modal -->
+      <div class="modal fade" id="editMovieModal" tabindex="-1" aria-labelledby="editMovieModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editMovieModalLabel">Edit Movie</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form id="edit-movie-form">
+                <input type="hidden" id="edit-movie-id">
+                <div class="mb-3">
+                  <label for="edit-movie-title" class="form-label">Title</label>
+                  <input type="text" class="form-control" id="edit-movie-title" required>
+                </div>
+                <div class="mb-3">
+                  <label for="edit-movie-description" class="form-label">Description</label>
+                  <input type="text" class="form-control" id="edit-movie-description" required>
+                </div>
+                <div class="mb-3">
+                  <label for="edit-movie-release-date" class="form-label">Release Date</label>
+                  <input type="date" class="form-control" id="edit-movie-release-date" required>
+                </div>
+                <div class="mb-3">
+                  <label for="edit-movie-duration" class="form-label">Duration (min)</label>
+                  <input type="number" class="form-control" id="edit-movie-duration" required>
+                </div>
+                <div class="mb-3">
+                  <label for="edit-movie-trailer-url" class="form-label">Trailer URL</label>
+                  <input type="url" class="form-control" id="edit-movie-trailer-url">
+                </div>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+              </form>
+              <div id="edit-movie-message" class="mt-2"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Add to the Manage Movies section, after the movies table -->
+      <div class="modal fade" id="showtimesModal" tabindex="-1" aria-labelledby="showtimesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="showtimesModalLabel">Manage Showtimes</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form id="add-showtime-form" class="row g-3 mb-4">
+                <input type="hidden" id="showtime-movie-id">
+                <div class="col-md-4">
+                  <input type="datetime-local" class="form-control" id="showtime-datetime" required>
+                </div>
+                <div class="col-md-4">
+                  <input type="text" class="form-control" id="showtime-location" placeholder="Location (optional)">
+                </div>
+                <div class="col-md-4">
+                  <button type="submit" class="btn btn-primary w-100">Add Showtime</button>
+                </div>
+              </form>
+              <div id="showtime-message" class="mb-3"></div>
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Showtime</th>
+                    <th>Location</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="showtimes-table-body">
+                  <!-- Showtimes will be loaded here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="users-section" class="mt-5">
+      <h3>Manage Users</h3>
+      <form id="add-user-form" class="row g-3 mb-4">
+        <div class="col-md-3">
+          <input type="text" class="form-control" id="user-username" placeholder="Username" required>
+        </div>
+        <div class="col-md-4">
+          <input type="email" class="form-control" id="user-email" placeholder="Email" required>
+        </div>
+        <div class="col-md-3">
+          <input type="password" class="form-control" id="user-password" placeholder="Password" required>
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-primary w-100">Add User</button>
+        </div>
+      </form>
+      <div id="user-message" class="mb-3"></div>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Created At</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="users-table-body">
+          <!-- Users will be loaded here -->
+        </tbody>
+      </table>
+      <!-- Edit User Modal -->
+      <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form id="edit-user-form">
+                <input type="hidden" id="edit-user-id">
+                <div class="mb-3">
+                  <label for="edit-user-username" class="form-label">Username</label>
+                  <input type="text" class="form-control" id="edit-user-username" required>
+                </div>
+                <div class="mb-3">
+                  <label for="edit-user-email" class="form-label">Email</label>
+                  <input type="email" class="form-control" id="edit-user-email" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+              </form>
+              <div id="edit-user-message" class="mt-2"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="tickets-section" class="mt-5">
+      <h3>Manage Tickets</h3>
+      <form id="add-ticket-form" class="row g-3 mb-4">
+        <div class="col-md-3">
+          <select class="form-control" id="ticket-user" required>
+            <option value="" disabled selected>Select User</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select class="form-control" id="ticket-movie" required>
+            <option value="" disabled selected>Select Movie</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select class="form-control" id="ticket-showtime" required>
+            <option value="" disabled selected>Select Showtime</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <input type="text" class="form-control" id="ticket-seat" placeholder="Seat Number" required>
+        </div>
+        <div class="col-md-3">
+          <button type="submit" class="btn btn-primary w-100">Book Ticket</button>
+        </div>
+      </form>
+      <div id="ticket-message" class="mb-3"></div>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Movie</th>
+            <th>Showtime</th>
+            <th>Location</th>
+            <th>Seat Number</th>
+            <th>Purchase Time</th>
+          </tr>
+        </thead>
+        <tbody id="tickets-table-body">
+          <!-- Tickets will be loaded here -->
+        </tbody>
+      </table>
+    </section>
+  </div>
+  <script>
+    function loadMovies() {
+      $.getJSON('api/get_movies.php', function(res) {
+        if (res.success) {
+          let html = '';
+          res.data.forEach(function(movie) {
+            html += `<tr>
+              <td>${movie.id}</td>
+              <td>${movie.title}</td>
+              <td>${movie.description}</td>
+              <td>${movie.release_date}</td>
+              <td>${movie.duration}</td>
+              <td>${movie.trailer_url || ''}</td>
+              <td><button class='btn btn-sm btn-warning edit-movie-btn' data-id='${movie.id}' data-title='${movie.title}' data-description='${movie.description}' data-release_date='${movie.release_date}' data-duration='${movie.duration}' data-trailer_url='${movie.trailer_url || ''}'>Edit</button> <button class='btn btn-sm btn-info showtimes-btn' data-movie_id='${movie.id}' data-title='${movie.title}'>Showtimes</button></td>
+            </tr>`;
+          });
+          $('#movies-table-body').html(html);
+        } else {
+          $('#movies-table-body').html('<tr><td colspan="7" class="text-danger">Failed to load movies.</td></tr>');
+        }
+      });
+    }
+    function loadUsers() {
+      $.getJSON('api/get_users.php', function(res) {
+        if (res.success) {
+          let html = '';
+          res.data.forEach(function(user) {
+            html += `<tr>
+              <td>${user.id}</td>
+              <td>${user.username}</td>
+              <td>${user.email}</td>
+              <td>${user.created_at}</td>
+              <td><button class='btn btn-sm btn-warning edit-user-btn' data-id='${user.id}' data-username='${user.username}' data-email='${user.email}'>Edit</button></td>
+            </tr>`;
+          });
+          $('#users-table-body').html(html);
+        } else {
+          $('#users-table-body').html('<tr><td colspan="5" class="text-danger">Failed to load users.</td></tr>');
+        }
+      });
+    }
+    function loadTickets() {
+      $.getJSON('api/get_tickets_admin.php', function(res) {
+        if (res.success) {
+          let html = '';
+          res.data.forEach(function(ticket) {
+            html += `<tr><td>${ticket.id}</td><td>${ticket.username}</td><td>${ticket.title}</td><td>${ticket.showtime ? ticket.showtime.replace('T', ' ').replace(':00.000Z', '') : ''}</td><td>${ticket.location || ''}</td><td>${ticket.seat_number}</td><td>${ticket.purchase_time}</td></tr>`;
+          });
+          $('#tickets-table-body').html(html);
+        } else {
+          $('#tickets-table-body').html('<tr><td colspan="7" class="text-danger">Failed to load tickets.</td></tr>');
+        }
+      });
+    }
+    function populateTicketForm() {
+      // Populate users
+      $.getJSON('api/get_users.php', function(res) {
+        if (res.success) {
+          let userOptions = '<option value="" disabled selected>Select User</option>';
+          res.data.forEach(function(user) {
+            userOptions += `<option value="${user.id}">${user.username} (${user.email})</option>`;
+          });
+          $('#ticket-user').html(userOptions);
+        }
+      });
+      // Populate movies
+      $.getJSON('api/get_movies.php', function(res) {
+        if (res.success) {
+          let movieOptions = '<option value="" disabled selected>Select Movie</option>';
+          res.data.forEach(function(movie) {
+            movieOptions += `<option value="${movie.id}">${movie.title}</option>`;
+          });
+          $('#ticket-movie').html(movieOptions);
+        }
+      });
+    }
+    $(document).ready(function() {
+      loadMovies();
+      loadUsers();
+      loadTickets();
+      populateTicketForm();
+      $('#add-movie-form').submit(function(e) {
+        e.preventDefault();
+        const data = {
+          title: $('#movie-title').val(),
+          description: $('#movie-description').val(),
+          release_date: $('#movie-release-date').val(),
+          duration: $('#movie-duration').val()
+        };
+        $.ajax({
+          url: 'api/add_movie.php',
+          method: 'POST',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(data),
+          success: function(res) {
+            if (res.success) {
+              $('#movie-message').removeClass('text-danger').addClass('text-success').text('Movie added!');
+              loadMovies();
+              $('#add-movie-form')[0].reset();
+            } else {
+              $('#movie-message').removeClass('text-success').addClass('text-danger').text(res.error || 'Failed to add movie.');
+            }
+          },
+          error: function() {
+            $('#movie-message').removeClass('text-success').addClass('text-danger').text('Failed to add movie.');
+          }
+        });
+      });
+      $('#add-user-form').submit(function(e) {
+        e.preventDefault();
+        const data = {
+          username: $('#user-username').val(),
+          email: $('#user-email').val(),
+          password: $('#user-password').val()
+        };
+        $.ajax({
+          url: 'api/register.php',
+          method: 'POST',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(data),
+          success: function(res) {
+            if (res.success || res.message) {
+              $('#user-message').removeClass('text-danger').addClass('text-success').text('User added!');
+              loadUsers();
+              $('#add-user-form')[0].reset();
+            } else {
+              $('#user-message').removeClass('text-success').addClass('text-danger').text(res.error || 'Failed to add user.');
+            }
+          },
+          error: function() {
+            $('#user-message').removeClass('text-success').addClass('text-danger').text('Failed to add user.');
+          }
+        });
+      });
+      $('#add-ticket-form').submit(function(e) {
+        e.preventDefault();
+        const data = {
+          user_id: $('#ticket-user').val(),
+          movie_id: $('#ticket-movie').val(),
+          showtime_id: $('#ticket-showtime').val(),
+          seat_number: $('#ticket-seat').val(),
+          location: $('#ticket-location').val()
+        };
+        $.ajax({
+          url: 'api/book_ticket.php',
+          method: 'POST',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(data),
+          success: function(res) {
+            if (res.success) {
+              $('#ticket-message').removeClass('text-danger').addClass('text-success').text('Ticket booked!');
+              loadTickets();
+              $('#add-ticket-form')[0].reset();
+            } else {
+              $('#ticket-message').removeClass('text-success').addClass('text-danger').text(res.error || 'Failed to book ticket.');
+            }
+          },
+          error: function() {
+            $('#ticket-message').removeClass('text-success').addClass('text-danger').text('Failed to book ticket.');
+          }
+        });
+      });
+      // Edit movie button click
+      $(document).on('click', '.edit-movie-btn', function() {
+        $('#edit-movie-id').val($(this).data('id'));
+        $('#edit-movie-title').val($(this).data('title'));
+        $('#edit-movie-description').val($(this).data('description'));
+        $('#edit-movie-release-date').val($(this).data('release_date'));
+        $('#edit-movie-duration').val($(this).data('duration'));
+        $('#edit-movie-trailer-url').val($(this).data('trailer_url'));
+        $('#edit-movie-message').text('');
+        var modal = new bootstrap.Modal(document.getElementById('editMovieModal'));
+        modal.show();
+      });
+      // Edit movie form submit
+      $('#edit-movie-form').submit(function(e) {
+        e.preventDefault();
+        const data = {
+          id: $('#edit-movie-id').val(),
+          title: $('#edit-movie-title').val(),
+          description: $('#edit-movie-description').val(),
+          release_date: $('#edit-movie-release-date').val(),
+          duration: $('#edit-movie-duration').val(),
+          trailer_url: $('#edit-movie-trailer-url').val()
+        };
+        $.ajax({
+          url: 'api/update_movie.php',
+          method: 'POST',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(data),
+          success: function(res) {
+            if (res.success) {
+              $('#edit-movie-message').removeClass('text-danger').addClass('text-success').text('Movie updated!');
+              loadMovies();
+              setTimeout(function() {
+                var modal = bootstrap.Modal.getInstance(document.getElementById('editMovieModal'));
+                modal.hide();
+              }, 800);
+            } else {
+              $('#edit-movie-message').removeClass('text-success').addClass('text-danger').text(res.error || 'Failed to update movie.');
+            }
+          },
+          error: function() {
+            $('#edit-movie-message').removeClass('text-success').addClass('text-danger').text('Failed to update movie.');
+          }
+        });
+      });
+      // Edit user button click
+      $(document).on('click', '.edit-user-btn', function() {
+        $('#edit-user-id').val($(this).data('id'));
+        $('#edit-user-username').val($(this).data('username'));
+        $('#edit-user-email').val($(this).data('email'));
+        $('#edit-user-message').text('');
+        var modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+        modal.show();
+      });
+      // Edit user form submit
+      $('#edit-user-form').submit(function(e) {
+        e.preventDefault();
+        const data = {
+          id: $('#edit-user-id').val(),
+          username: $('#edit-user-username').val(),
+          email: $('#edit-user-email').val()
+        };
+        $.ajax({
+          url: 'api/update_user.php',
+          method: 'POST',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(data),
+          success: function(res) {
+            if (res.success) {
+              $('#edit-user-message').removeClass('text-danger').addClass('text-success').text('User updated!');
+              loadUsers();
+              setTimeout(function() {
+                var modal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
+                modal.hide();
+              }, 800);
+            } else {
+              $('#edit-user-message').removeClass('text-success').addClass('text-danger').text(res.error || 'Failed to update user.');
+            }
+          },
+          error: function() {
+            $('#edit-user-message').removeClass('text-success').addClass('text-danger').text('Failed to update user.');
+          }
+        });
+      });
+      // Add JS for showtime management:
+      $(document).on('click', '.showtimes-btn', function() {
+        var movieId = $(this).data('movie_id');
+        var movieTitle = $(this).data('title');
+        $('#showtimesModalLabel').text('Manage Showtimes for ' + movieTitle);
+        $('#showtime-movie-id').val(movieId);
+        loadShowtimes(movieId);
+        $('#showtime-message').text('');
+        var modal = new bootstrap.Modal(document.getElementById('showtimesModal'));
+        modal.show();
+      });
+      function loadShowtimes(movieId) {
+        $.getJSON('api/get_showtimes.php?movie_id=' + movieId, function(res) {
+          if (res.success) {
+            let html = '';
+            res.data.forEach(function(showtime) {
+              html += `<tr><td>${showtime.id}</td><td>${showtime.showtime.replace('T', ' ').replace(':00.000Z', '')}${showtime.location ? ' @ ' + showtime.location : ''}</td><td>${showtime.location || ''}</td><td><button class='btn btn-sm btn-danger delete-showtime-btn' data-id='${showtime.id}' data-movie_id='${movieId}'>Delete</button></td></tr>`;
+            });
+            $('#showtimes-table-body').html(html);
+          } else {
+            $('#showtimes-table-body').html('<tr><td colspan="4" class="text-danger">Failed to load showtimes.</td></tr>');
+          }
+        });
+      }
+      $('#add-showtime-form').submit(function(e) {
+        e.preventDefault();
+        var movieId = $('#showtime-movie-id').val();
+        var showtime = $('#showtime-datetime').val();
+        var location = $('#showtime-location').val();
+        $.ajax({
+          url: 'api/add_showtime.php',
+          method: 'POST',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify({ movie_id: movieId, showtime: showtime, location: location }),
+          success: function(res) {
+            if (res.success) {
+              $('#showtime-message').removeClass('text-danger').addClass('text-success').text('Showtime added!');
+              loadShowtimes(movieId);
+              $('#add-showtime-form')[0].reset();
+            } else {
+              $('#showtime-message').removeClass('text-success').addClass('text-danger').text(res.error || 'Failed to add showtime.');
+            }
+          },
+          error: function() {
+            $('#showtime-message').removeClass('text-success').addClass('text-danger').text('Failed to add showtime.');
+          }
+        });
+      });
+      $(document).on('click', '.delete-showtime-btn', function() {
+        var showtimeId = $(this).data('id');
+        var movieId = $(this).data('movie_id');
+        if (confirm('Delete this showtime?')) {
+          $.ajax({
+            url: 'api/delete_showtime.php',
+            method: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({ id: showtimeId }),
+            success: function(res) {
+              if (res.success) {
+                loadShowtimes(movieId);
+              }
+            }
+          });
+        }
+      });
+      // In JS, when a movie is selected, load showtimes for that movie and auto-fill location on showtime select
+      $('#ticket-movie').on('change', function() {
+        var movieId = $(this).val();
+        if (movieId) {
+          $.getJSON('api/get_showtimes.php?movie_id=' + movieId, function(res) {
+            let showtimeOptions = '<option value="" disabled selected>Select Showtime</option>';
+            if (res.success) {
+              res.data.forEach(function(showtime) {
+                showtimeOptions += `<option value="${showtime.id}" data-location="${showtime.location || ''}">${showtime.showtime.replace('T', ' ').replace(':00.000Z', '')}${showtime.location ? ' @ ' + showtime.location : ''}</option>`;
+              });
+            }
+            $('#ticket-showtime').html(showtimeOptions);
+          });
+        } else {
+          $('#ticket-showtime').html('<option value="" disabled selected>Select Showtime</option>');
+        }
+        $('#ticket-location').val('');
+      });
+      $('#ticket-showtime').on('change', function() {
+        var location = $('#ticket-showtime option:selected').data('location') || '';
+        $('#ticket-location').val(location);
+      });
+    });
+  </script>
+</body>
+</html> 
